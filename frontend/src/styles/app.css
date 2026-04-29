@@ -153,6 +153,18 @@ body {
   margin-top: 16px;
 }
 
+.customer-toolbar {
+  flex-wrap: wrap;
+}
+
+.customer-toolbar .el-select {
+  width: 160px;
+}
+
+.form-wide-control {
+  width: 100%;
+}
+
 .login-page {
   display: grid;
   min-height: 100vh;

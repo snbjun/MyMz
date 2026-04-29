@@ -2,6 +2,7 @@ import { createRouter, createWebHistory, RouteRecordRaw } from "vue-router";
 
 import MainLayout from "@/layouts/MainLayout.vue";
 import { useAuthStore } from "@/stores/auth";
+import CustomerManagementView from "@/views/customers/CustomerManagementView.vue";
 import DashboardHome from "@/views/dashboard/DashboardHome.vue";
 import LoginView from "@/views/login/LoginView.vue";
 import PlaceholderView from "@/views/placeholder/PlaceholderView.vue";
@@ -40,7 +41,12 @@ const routes: RouteRecordRaw[] = [
       ...moduleRoutes.map((route) => ({
         path: route.path,
         name: route.name,
-        component: route.name === "users" ? UserManagementView : PlaceholderView,
+        component:
+          route.name === "users"
+            ? UserManagementView
+            : route.name === "customers"
+              ? CustomerManagementView
+              : PlaceholderView,
         meta: { titleKey: route.titleKey, requiresSuperuser: route.name === "users" },
       })),
     ],
