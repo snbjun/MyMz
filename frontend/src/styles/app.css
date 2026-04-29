@@ -154,12 +154,14 @@ body {
 }
 
 .customer-toolbar,
-.supplier-toolbar {
+.supplier-toolbar,
+.product-toolbar {
   flex-wrap: wrap;
 }
 
 .customer-toolbar .el-select,
-.supplier-toolbar .el-select {
+.supplier-toolbar .el-select,
+.product-toolbar .el-select {
   width: 160px;
 }
 

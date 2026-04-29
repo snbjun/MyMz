@@ -6,6 +6,7 @@ import CustomerManagementView from "@/views/customers/CustomerManagementView.vue
 import DashboardHome from "@/views/dashboard/DashboardHome.vue";
 import LoginView from "@/views/login/LoginView.vue";
 import PlaceholderView from "@/views/placeholder/PlaceholderView.vue";
+import ProductManagementView from "@/views/products/ProductManagementView.vue";
 import SupplierManagementView from "@/views/suppliers/SupplierManagementView.vue";
 import UserManagementView from "@/views/users/UserManagementView.vue";
 
@@ -49,7 +50,9 @@ const routes: RouteRecordRaw[] = [
               ? CustomerManagementView
               : route.name === "suppliers"
                 ? SupplierManagementView
-                : PlaceholderView,
+                : route.name === "products"
+                  ? ProductManagementView
+                  : PlaceholderView,
         meta: { titleKey: route.titleKey, requiresSuperuser: route.name === "users" },
       })),
     ],

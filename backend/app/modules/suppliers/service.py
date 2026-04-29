@@ -1,4 +1,4 @@
-﻿from fastapi import HTTPException, status
+from fastapi import HTTPException, status
 from sqlalchemy.orm import Session
 
 from app.modules.suppliers.model import Supplier, SupplierCategory
