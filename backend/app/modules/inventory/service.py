@@ -146,6 +146,56 @@ class InventoryService:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="库存流水不存在")
         return self._movement_to_schema(movement)
 
+    def record_sale_out(
+        self,
+        product: Product,
+        warehouse: Warehouse,
+        quantity: Decimal,
+        source_id: int,
+        remark: str | None,
+        current_user: User,
+    ) -> None:
+        """第 7 阶段新增：销售单复用库存服务出库，不在这里提交事务。"""
+
+        inventory = self.repo.get_or_create_inventory(product.id, warehouse.id)
+        self._apply_decrease(
+            product,
+            warehouse,
+            inventory,
+            self._qty(quantity),
+            "sale_out",
+            "sales_order",
+            remark,
+            current_user,
+            source_id=source_id,
+        )
+
+    def record_cancel_reverse(
+        self,
+        product: Product,
+        warehouse: Warehouse,
+        quantity: Decimal,
+        unit_cost: Decimal,
+        source_id: int,
+        remark: str | None,
+        current_user: User,
+    ) -> None:
+        """第 7 阶段新增：销售单作废时复用库存服务生成反冲入库流水。"""
+
+        inventory = self.repo.get_or_create_inventory(product.id, warehouse.id)
+        self._apply_increase(
+            product,
+            warehouse,
+            inventory,
+            self._qty(quantity),
+            self._cost(unit_cost),
+            "cancel_reverse",
+            "sales_order",
+            remark,
+            current_user,
+            source_id=source_id,
+        )
+
     def _apply_increase(
         self,
         product: Product,
@@ -157,6 +207,7 @@ class InventoryService:
         source_type: str,
         remark: str | None,
         current_user: User,
+        source_id: int | None = None,
     ) -> None:
         if quantity <= ZERO_QTY:
             raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="入库数量必须大于 0")
@@ -184,7 +235,7 @@ class InventoryService:
             before_avg_cost,
             after_avg_cost,
             source_type,
-            None,
+            source_id,
             remark,
             current_user,
         )
@@ -199,6 +250,7 @@ class InventoryService:
         source_type: str,
         remark: str | None,
         current_user: User,
+        source_id: int | None = None,
     ) -> None:
         if quantity <= ZERO_QTY:
             raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="出库数量必须大于 0")
@@ -224,7 +276,7 @@ class InventoryService:
             before_avg_cost,
             after_avg_cost,
             source_type,
-            None,
+            source_id,
             remark,
             current_user,
         )

@@ -156,15 +156,46 @@ body {
 .customer-toolbar,
 .supplier-toolbar,
 .product-toolbar,
-.inventory-toolbar {
+.inventory-toolbar,
+.sales-toolbar {
   flex-wrap: wrap;
 }
 
 .customer-toolbar .el-select,
 .supplier-toolbar .el-select,
 .product-toolbar .el-select,
-.inventory-toolbar .el-select {
+.inventory-toolbar .el-select,
+.sales-toolbar .el-select {
   width: 160px;
+}
+
+.sales-toolbar .el-date-editor {
+  width: 260px;
+}
+
+.sales-form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0 16px;
+}
+
+.sales-items-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin: 8px 0 12px;
+}
+
+.sales-total-bar {
+  display: flex;
+  justify-content: flex-end;
+  gap: 28px;
+  margin-top: 14px;
+  font-weight: 700;
+}
+
+.dialog-remark {
+  margin-top: 14px;
 }
 
 .form-wide-control {

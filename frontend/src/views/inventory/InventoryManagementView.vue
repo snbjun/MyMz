@@ -122,6 +122,7 @@ function movementSourceText(value: string) {
     sourceType_manual_initial: t("sourceType_manual_initial"),
     sourceType_manual_adjustment: t("sourceType_manual_adjustment"),
     sourceType_stocktaking: t("sourceType_stocktaking"),
+    sourceType_sales_order: t("sourceType_sales_order"),
   };
   return sourceMap[key] || value;
 }

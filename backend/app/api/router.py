@@ -4,6 +4,7 @@ from app.modules.auth.router import router as auth_router
 from app.modules.customers.router import router as customers_router
 from app.modules.inventory.router import router as inventory_router
 from app.modules.products.router import router as products_router
+from app.modules.sales.router import router as sales_router
 from app.modules.suppliers.router import router as suppliers_router
 from app.modules.users.router import router as users_router
 
@@ -21,5 +22,6 @@ router.include_router(auth_router, prefix="/auth", tags=["auth"])
 router.include_router(customers_router, tags=["customers"])
 router.include_router(inventory_router, tags=["inventory"])
 router.include_router(products_router, tags=["products"])
+router.include_router(sales_router, tags=["sales"])
 router.include_router(suppliers_router, tags=["suppliers"])
 router.include_router(users_router, prefix="/users", tags=["users"])
