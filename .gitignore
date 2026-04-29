@@ -1,0 +1,38 @@
+# Local reference files, do not publish
+design_files/
+
+# Local data
+data/app.db
+data/*.db
+data/uploads/*
+data/backups/*
+!data/uploads/.gitkeep
+!data/backups/.gitkeep
+
+# Env
+.env
+.env.*
+!.env.example
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Node
+node_modules/
+dist/
+build/
+.vite/
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
