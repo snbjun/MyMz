@@ -2,6 +2,7 @@ from fastapi import APIRouter
 
 from app.modules.auth.router import router as auth_router
 from app.modules.customers.router import router as customers_router
+from app.modules.suppliers.router import router as suppliers_router
 from app.modules.users.router import router as users_router
 
 router = APIRouter()
@@ -16,4 +17,5 @@ def health_check() -> dict[str, str]:
 
 router.include_router(auth_router, prefix="/auth", tags=["auth"])
 router.include_router(customers_router, tags=["customers"])
+router.include_router(suppliers_router, tags=["suppliers"])
 router.include_router(users_router, prefix="/users", tags=["users"])

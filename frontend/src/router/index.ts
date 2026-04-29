@@ -6,6 +6,7 @@ import CustomerManagementView from "@/views/customers/CustomerManagementView.vue
 import DashboardHome from "@/views/dashboard/DashboardHome.vue";
 import LoginView from "@/views/login/LoginView.vue";
 import PlaceholderView from "@/views/placeholder/PlaceholderView.vue";
+import SupplierManagementView from "@/views/suppliers/SupplierManagementView.vue";
 import UserManagementView from "@/views/users/UserManagementView.vue";
 
 export const moduleRoutes = [
@@ -46,7 +47,9 @@ const routes: RouteRecordRaw[] = [
             ? UserManagementView
             : route.name === "customers"
               ? CustomerManagementView
-              : PlaceholderView,
+              : route.name === "suppliers"
+                ? SupplierManagementView
+                : PlaceholderView,
         meta: { titleKey: route.titleKey, requiresSuperuser: route.name === "users" },
       })),
     ],

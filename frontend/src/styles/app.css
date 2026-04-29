@@ -153,11 +153,13 @@ body {
   margin-top: 16px;
 }
 
-.customer-toolbar {
+.customer-toolbar,
+.supplier-toolbar {
   flex-wrap: wrap;
 }
 
-.customer-toolbar .el-select {
+.customer-toolbar .el-select,
+.supplier-toolbar .el-select {
   width: 160px;
 }
 

@@ -86,6 +86,16 @@ const messages = {
   sortOrder: "排序",
   defaultCategory: "默认分类",
   categoryDeleteConfirm: "确认删除该分类？",
+  supplierCode: "供应商编号",
+  supplierName: "供应商名称",
+  supplierNameRequired: "请输入供应商名称",
+  supplierCategory: "供应商分类",
+  openingPayable: "期初应付",
+  currentPayable: "当前应付",
+  addSupplier: "新增供应商",
+  editSupplier: "编辑供应商",
+  supplierKeywordPlaceholder: "搜索供应商名称、编号、联系人、电话或地址",
+  supplierDeleteConfirm: "确认删除该供应商？",
 };
 
 export type MessageKey = keyof typeof messages;
