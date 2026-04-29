@@ -4,6 +4,7 @@ import MainLayout from "@/layouts/MainLayout.vue";
 import { useAuthStore } from "@/stores/auth";
 import CustomerManagementView from "@/views/customers/CustomerManagementView.vue";
 import DashboardHome from "@/views/dashboard/DashboardHome.vue";
+import InventoryManagementView from "@/views/inventory/InventoryManagementView.vue";
 import LoginView from "@/views/login/LoginView.vue";
 import PlaceholderView from "@/views/placeholder/PlaceholderView.vue";
 import ProductManagementView from "@/views/products/ProductManagementView.vue";
@@ -52,7 +53,9 @@ const routes: RouteRecordRaw[] = [
                 ? SupplierManagementView
                 : route.name === "products"
                   ? ProductManagementView
-                  : PlaceholderView,
+                  : route.name === "inventory"
+                    ? InventoryManagementView
+                    : PlaceholderView,
         meta: { titleKey: route.titleKey, requiresSuperuser: route.name === "users" },
       })),
     ],
