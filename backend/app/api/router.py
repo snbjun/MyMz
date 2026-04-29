@@ -1,5 +1,8 @@
 from fastapi import APIRouter
 
+from app.modules.auth.router import router as auth_router
+from app.modules.users.router import router as users_router
+
 router = APIRouter()
 
 
@@ -8,3 +11,7 @@ def health_check() -> dict[str, str]:
     """骨架阶段新增：供本地开发、Docker 和测试使用的健康检查。"""
 
     return {"status": "ok", "service": "mymz-backend"}
+
+
+router.include_router(auth_router, prefix="/auth", tags=["auth"])
+router.include_router(users_router, prefix="/users", tags=["users"])

@@ -11,6 +11,13 @@ class Settings(BaseSettings):
     app_env: str = "development"
     api_prefix: str = "/api"
     database_url: str = "sqlite:///../data/app.db"
+    # 第 2 阶段新增：JWT 与初始化管理员配置，从“静态跳转登录”改为真实认证。
+    secret_key: str = "change-this-secret-key-in-production"
+    algorithm: str = "HS256"
+    access_token_expire_minutes: int = 480
+    admin_username: str = "admin"
+    admin_password: str = "admin123456"
+    admin_display_name: str = "系统管理员"
     cors_origins: str = Field(
         default="http://localhost:8080,http://127.0.0.1:8080",
         description="Comma separated CORS origins for local frontend development.",

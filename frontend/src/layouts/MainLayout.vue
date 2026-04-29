@@ -20,8 +20,8 @@ const menuItems = computed(() => [
   })),
 ]);
 
-function handleLogout() {
-  authStore.logout();
+async function handleLogout() {
+  await authStore.logout();
   router.push("/login");
 }
 </script>
@@ -48,7 +48,7 @@ function handleLogout() {
       <el-header class="app-header">
         <div class="page-title">{{ route.meta.titleKey ? t(route.meta.titleKey as MessageKey) : t("dashboard") }}</div>
         <div class="header-actions">
-          <span class="user-name">{{ authStore.username || "admin" }}</span>
+          <span class="user-name">{{ authStore.displayName || "admin" }}</span>
           <el-button @click="handleLogout">{{ t("logout") }}</el-button>
         </div>
       </el-header>

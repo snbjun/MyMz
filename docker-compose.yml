@@ -7,6 +7,11 @@ services:
       APP_ENV: development
       DATABASE_URL: sqlite:///../data/app.db
       CORS_ORIGINS: http://localhost:8080,http://127.0.0.1:8080
+      SECRET_KEY: please-change-this-secret-key
+      ACCESS_TOKEN_EXPIRE_MINUTES: 480
+      ADMIN_USERNAME: admin
+      ADMIN_PASSWORD: admin123456
+      ADMIN_DISPLAY_NAME: 系统管理员
     volumes:
       - ./data:/app/data
     ports:

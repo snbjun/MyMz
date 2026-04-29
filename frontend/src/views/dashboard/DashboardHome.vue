@@ -1,9 +1,11 @@
 <script setup lang="ts">
 import { ref } from "vue";
+import { useRoute } from "vue-router";
 
 import { getHealth } from "@/api/health";
 import { t } from "@/i18n";
 
+const route = useRoute();
 const healthText = ref("");
 
 async function checkHealth() {
@@ -14,6 +16,7 @@ async function checkHealth() {
 
 <template>
   <section class="page-card">
+    <el-alert v-if="route.query.forbidden" class="page-alert" type="warning" :title="t('permissionDenied')" show-icon />
     <h1>{{ t("scaffoldReady") }}</h1>
     <p>{{ t("scaffoldIntro") }}</p>
     <el-button type="primary" @click="checkHealth">{{ t("backendHealth") }}</el-button>
