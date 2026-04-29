@@ -1,0 +1,1 @@
+"""MyMz backend application package."""
