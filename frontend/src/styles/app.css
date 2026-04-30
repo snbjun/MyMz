@@ -157,7 +157,8 @@ body {
 .supplier-toolbar,
 .product-toolbar,
 .inventory-toolbar,
-.sales-toolbar {
+.sales-toolbar,
+.purchase-toolbar {
   flex-wrap: wrap;
 }
 
@@ -165,28 +166,33 @@ body {
 .supplier-toolbar .el-select,
 .product-toolbar .el-select,
 .inventory-toolbar .el-select,
-.sales-toolbar .el-select {
+.sales-toolbar .el-select,
+.purchase-toolbar .el-select {
   width: 160px;
 }
 
-.sales-toolbar .el-date-editor {
+.sales-toolbar .el-date-editor,
+.purchase-toolbar .el-date-editor {
   width: 260px;
 }
 
-.sales-form-grid {
+.sales-form-grid,
+.purchase-form-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 0 16px;
 }
 
-.sales-items-header {
+.sales-items-header,
+.purchase-items-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
   margin: 8px 0 12px;
 }
 
-.sales-total-bar {
+.sales-total-bar,
+.purchase-total-bar {
   display: flex;
   justify-content: flex-end;
   gap: 28px;

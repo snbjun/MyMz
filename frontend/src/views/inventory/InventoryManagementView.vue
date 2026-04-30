@@ -123,6 +123,7 @@ function movementSourceText(value: string) {
     sourceType_manual_adjustment: t("sourceType_manual_adjustment"),
     sourceType_stocktaking: t("sourceType_stocktaking"),
     sourceType_sales_order: t("sourceType_sales_order"),
+    sourceType_purchase_order: t("sourceType_purchase_order"),
   };
   return sourceMap[key] || value;
 }

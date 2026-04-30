@@ -196,6 +196,56 @@ class InventoryService:
             source_id=source_id,
         )
 
+    def record_purchase_in(
+        self,
+        product: Product,
+        warehouse: Warehouse,
+        quantity: Decimal,
+        unit_cost: Decimal,
+        source_id: int,
+        remark: str | None,
+        current_user: User,
+    ) -> None:
+        """第 8 阶段新增：采购单收货复用库存服务入库，不在这里提交事务。"""
+
+        inventory = self.repo.get_or_create_inventory(product.id, warehouse.id)
+        self._apply_increase(
+            product,
+            warehouse,
+            inventory,
+            self._qty(quantity),
+            self._cost(unit_cost),
+            "purchase_in",
+            "purchase_order",
+            remark,
+            current_user,
+            source_id=source_id,
+        )
+
+    def record_purchase_cancel_reverse(
+        self,
+        product: Product,
+        warehouse: Warehouse,
+        quantity: Decimal,
+        source_id: int,
+        remark: str | None,
+        current_user: User,
+    ) -> None:
+        """第 8 阶段新增：采购单作废时复用库存服务生成反冲出库流水。"""
+
+        inventory = self.repo.get_or_create_inventory(product.id, warehouse.id)
+        self._apply_decrease(
+            product,
+            warehouse,
+            inventory,
+            self._qty(quantity),
+            "cancel_reverse",
+            "purchase_order",
+            remark,
+            current_user,
+            source_id=source_id,
+        )
+
     def _apply_increase(
         self,
         product: Product,
