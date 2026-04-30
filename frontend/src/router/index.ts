@@ -4,6 +4,7 @@ import MainLayout from "@/layouts/MainLayout.vue";
 import { useAuthStore } from "@/stores/auth";
 import CustomerManagementView from "@/views/customers/CustomerManagementView.vue";
 import DashboardHome from "@/views/dashboard/DashboardHome.vue";
+import FinanceManagementView from "@/views/finance/FinanceManagementView.vue";
 import InventoryManagementView from "@/views/inventory/InventoryManagementView.vue";
 import LoginView from "@/views/login/LoginView.vue";
 import PlaceholderView from "@/views/placeholder/PlaceholderView.vue";
@@ -20,7 +21,7 @@ export const moduleRoutes = [
   { path: "inventory", name: "inventory", titleKey: "inventory" },
   { path: "sales-orders", name: "salesOrders", titleKey: "salesOrders" },
   { path: "purchase-orders", name: "purchaseOrders", titleKey: "purchaseOrders" },
-  { path: "expense-income", name: "expenseIncome", titleKey: "expenseIncome" },
+  { path: "finance", name: "finance", titleKey: "expenseIncome" },
   { path: "reports", name: "reports", titleKey: "reports" },
   { path: "users", name: "users", titleKey: "users" },
   { path: "settings", name: "settings", titleKey: "settings" },
@@ -61,7 +62,9 @@ const routes: RouteRecordRaw[] = [
                       ? SalesOrderListView
                       : route.name === "purchaseOrders"
                         ? PurchaseOrderListView
-                      : PlaceholderView,
+                        : route.name === "finance"
+                          ? FinanceManagementView
+                          : PlaceholderView,
         meta: { titleKey: route.titleKey, requiresSuperuser: route.name === "users" },
       })),
     ],

@@ -158,7 +158,8 @@ body {
 .product-toolbar,
 .inventory-toolbar,
 .sales-toolbar,
-.purchase-toolbar {
+.purchase-toolbar,
+.finance-toolbar {
   flex-wrap: wrap;
 }
 
@@ -167,12 +168,14 @@ body {
 .product-toolbar .el-select,
 .inventory-toolbar .el-select,
 .sales-toolbar .el-select,
-.purchase-toolbar .el-select {
+.purchase-toolbar .el-select,
+.finance-toolbar .el-select {
   width: 160px;
 }
 
 .sales-toolbar .el-date-editor,
-.purchase-toolbar .el-date-editor {
+.purchase-toolbar .el-date-editor,
+.finance-toolbar .el-date-editor {
   width: 260px;
 }
 
