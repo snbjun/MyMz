@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, onMounted, reactive, ref } from "vue";
 import { ElMessage, ElMessageBox, type FormInstance, type FormRules } from "element-plus";
+import { useRouter } from "vue-router";
 
 import { listCustomers } from "@/api/customers";
 import { listProducts } from "@/api/products";
@@ -36,6 +37,7 @@ interface SalesFormItem {
 }
 
 const loading = ref(false);
+const router = useRouter();
 const customersLoading = ref(false);
 const productsLoading = ref(false);
 const tableData = ref<SalesOrderListItem[]>([]);
@@ -411,8 +413,8 @@ async function handleCancel(row: SalesOrderListItem) {
   await fetchOrders();
 }
 
-function handlePrint() {
-  ElMessage.info(t("printComingSoon"));
+function handlePrint(row: SalesOrderListItem) {
+  router.push({ name: "salesOrderPrint", params: { id: row.id } });
 }
 
 onMounted(async () => {
@@ -476,7 +478,7 @@ onMounted(async () => {
           <el-button v-if="row.status === 'draft'" size="small" type="primary" @click="handleConfirm(row)">{{ t("confirmSalesOrder") }}</el-button>
           <el-button v-if="row.status === 'confirmed'" size="small" @click="openShipDialog(row)">{{ t("shipSalesOrder") }}</el-button>
           <el-button v-if="row.status === 'confirmed'" size="small" @click="openPaymentDialog(row)">{{ t("receivePayment") }}</el-button>
-          <el-button v-if="row.status === 'confirmed'" size="small" @click="handlePrint">{{ t("print") }}</el-button>
+          <el-button size="small" @click="handlePrint(row)">{{ t("print") }}</el-button>
           <el-button v-if="row.status !== 'cancelled'" size="small" type="danger" @click="handleCancel(row)">{{ t("cancelSalesOrder") }}</el-button>
         </template>
       </el-table-column>

@@ -8,6 +8,7 @@ from app.core.database import Base
 from app.modules.customers import model as customers_model  # noqa: F401
 from app.modules.finance import model as finance_model  # noqa: F401
 from app.modules.inventory import model as inventory_model  # noqa: F401
+from app.modules.print_templates import model as print_templates_model  # noqa: F401
 from app.modules.products import model as products_model  # noqa: F401
 from app.modules.purchase import model as purchase_model  # noqa: F401
 from app.modules.sales import model as sales_model  # noqa: F401

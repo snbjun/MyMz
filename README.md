@@ -362,6 +362,57 @@ curl -H "Authorization: Bearer <token>" "http://localhost:8000/api/reports/overv
 
 说明：该利润是经营估算，不是严格会计利润。第一版不包含 Excel 导出、自定义报表设计器和复杂 BI 图表。
 
+## 打印模块
+
+打印模块入口来自销售单和采购单列表中的“打印”按钮，也可以直接访问：
+
+- 销售单打印页面：`http://localhost:8080/sales-orders/{id}/print`
+- 采购单打印页面：`http://localhost:8080/purchase-orders/{id}/print`
+
+本阶段打印方式为 HTML/CSS 浏览器打印：
+
+- 前端打印页使用 `window.print()` 调用浏览器打印。
+- 使用 `@media print` 隐藏顶部工具栏。
+- 使用 `@page` 设置 A4 纸张。
+- 草稿、已确认、已作废单据均允许打印；已作废单据会显示“已作废”标记。
+
+支持的打印配置字段：
+
+- 模板名称 `template_name`
+- 纸张尺寸 `paper_size`，第一版固定 A4
+- 是否显示公司名称 `show_company_name`
+- 公司名称 `company_name`
+- 是否显示联系方式 `show_contact`
+- 联系方式文本 `contact_text`
+- 是否显示金额 `show_amount`
+- 是否显示单价 `show_unit_price`
+- 是否显示优惠 `show_discount`
+- 是否显示备注 `show_remark`
+- 是否显示签字栏 `show_signature`
+- 页脚文字 `footer_text`
+
+打印配置接口均需要登录。每种单据类型第一版维护一个默认配置：
+
+- `sales_order`
+- `purchase_order`
+
+后端打印数据接口：
+
+- `GET /api/print-settings`
+- `GET /api/print-settings/{doc_type}`
+- `PUT /api/print-settings/{doc_type}`
+- `GET /api/print/sales-orders/{id}`
+- `GET /api/print/purchase-orders/{id}`
+
+本阶段不支持 PDF 生成、不支持复杂模板设计器、不支持套打坐标编辑、不支持批量打印，也没有引入重量级打印库。
+
+运行打印配置迁移：
+
+```bash
+cd backend
+alembic upgrade head
+```
+
 ## Docker Compose 启动
 
 ```bash

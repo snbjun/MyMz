@@ -9,6 +9,8 @@ import InventoryManagementView from "@/views/inventory/InventoryManagementView.v
 import LoginView from "@/views/login/LoginView.vue";
 import PlaceholderView from "@/views/placeholder/PlaceholderView.vue";
 import ProductManagementView from "@/views/products/ProductManagementView.vue";
+import PurchaseOrderPrintView from "@/views/printing/PurchaseOrderPrintView.vue";
+import SalesOrderPrintView from "@/views/printing/SalesOrderPrintView.vue";
 import PurchaseOrderListView from "@/views/purchase/PurchaseOrderListView.vue";
 import ReportsView from "@/views/reports/ReportsView.vue";
 import SalesOrderListView from "@/views/sales/SalesOrderListView.vue";
@@ -71,6 +73,18 @@ const routes: RouteRecordRaw[] = [
         meta: { titleKey: route.titleKey, requiresSuperuser: route.name === "users" },
       })),
     ],
+  },
+  {
+    path: "/sales-orders/:id/print",
+    name: "salesOrderPrint",
+    component: SalesOrderPrintView,
+    meta: { requiresAuth: true },
+  },
+  {
+    path: "/purchase-orders/:id/print",
+    name: "purchaseOrderPrint",
+    component: PurchaseOrderPrintView,
+    meta: { requiresAuth: true },
   },
 ];
 

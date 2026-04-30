@@ -4,6 +4,7 @@ from app.modules.auth.router import router as auth_router
 from app.modules.customers.router import router as customers_router
 from app.modules.finance.router import router as finance_router
 from app.modules.inventory.router import router as inventory_router
+from app.modules.print_templates.router import router as print_templates_router
 from app.modules.products.router import router as products_router
 from app.modules.purchase.router import router as purchase_router
 from app.modules.reports.router import router as reports_router
@@ -25,6 +26,7 @@ router.include_router(auth_router, prefix="/auth", tags=["auth"])
 router.include_router(customers_router, tags=["customers"])
 router.include_router(finance_router, tags=["finance"])
 router.include_router(inventory_router, tags=["inventory"])
+router.include_router(print_templates_router, tags=["print"])
 router.include_router(products_router, tags=["products"])
 router.include_router(purchase_router, tags=["purchase"])
 router.include_router(reports_router, tags=["reports"])
