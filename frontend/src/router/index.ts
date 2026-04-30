@@ -10,6 +10,7 @@ import LoginView from "@/views/login/LoginView.vue";
 import PlaceholderView from "@/views/placeholder/PlaceholderView.vue";
 import ProductManagementView from "@/views/products/ProductManagementView.vue";
 import PurchaseOrderListView from "@/views/purchase/PurchaseOrderListView.vue";
+import ReportsView from "@/views/reports/ReportsView.vue";
 import SalesOrderListView from "@/views/sales/SalesOrderListView.vue";
 import SupplierManagementView from "@/views/suppliers/SupplierManagementView.vue";
 import UserManagementView from "@/views/users/UserManagementView.vue";
@@ -64,6 +65,8 @@ const routes: RouteRecordRaw[] = [
                         ? PurchaseOrderListView
                         : route.name === "finance"
                           ? FinanceManagementView
+                          : route.name === "reports"
+                            ? ReportsView
                           : PlaceholderView,
         meta: { titleKey: route.titleKey, requiresSuperuser: route.name === "users" },
       })),

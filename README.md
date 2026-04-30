@@ -301,6 +301,67 @@ cd backend
 alembic upgrade head
 ```
 
+## 报表模块
+
+报表模块入口：登录后左侧菜单 `报表`，页面路径为 `http://localhost:8080/reports`。报表接口均需要登录，接口路径以 `/api/reports` 开头，例如：
+
+```bash
+curl -H "Authorization: Bearer <token>" "http://localhost:8000/api/reports/overview"
+```
+
+默认日期范围：
+
+- 所有带日期范围的报表如果不传 `start_date` 和 `end_date`，默认统计当前自然月，即本月 1 日至今天。
+- 销售报表按 `sales_orders.order_date` 过滤。
+- 采购报表按 `purchase_orders.order_date` 过滤。
+- 费用收入报表按 `finance_records.record_date` 过滤。
+- 库存流水报表按 `stock_movements.created_at` 过滤。
+
+销售统计口径：
+
+- 只统计 `sales_orders.status = confirmed` 的销售单。
+- 不统计 `draft` 和 `cancelled`。
+- 销售金额使用销售单 `receivable_amount` 汇总。
+- 产品销售金额使用 `sales_order_items.line_amount` 汇总。
+- 已确认但未送货的销售单仍计入销售报表，库存出库情况由库存报表体现。
+
+采购统计口径：
+
+- 只统计 `purchase_orders.status = confirmed` 的采购单。
+- 不统计 `draft` 和 `cancelled`。
+- 采购金额使用采购单 `payable_amount` 汇总。
+- 产品采购金额使用 `purchase_order_items.line_amount` 汇总。
+- 已确认但未收货的采购单仍计入采购报表，库存入库情况由库存报表体现。
+
+应收应付统计口径：
+
+- 客户应收来源于 `customers.current_receivable`，只统计未删除客户。
+- 供应商应付来源于 `suppliers.current_payable`，只统计未删除供应商。
+- 第一版默认隐藏 0 余额，可通过 `include_zero=true` 查询 0 余额记录。
+
+库存统计口径：
+
+- 库存余额来源于 `inventory`，关联未删除产品。
+- 库存金额使用 `inventory.total_cost` 汇总。
+- 低库存产品按启用产品、`stock_warning_qty > 0` 且当前库存小于等于预警值统计。
+- 库存流水按 `movement_type` 汇总入库/出库数量和金额。
+
+资金统计口径：
+
+- 账户余额来源于 `finance_accounts.current_balance`，只统计未删除账户。
+- 收支统计只统计 `finance_records.status = normal` 的流水。
+- 收支净额 = 收入合计 - 支出合计。
+
+利润估算口径：
+
+```text
+毛利润 = 销售应收金额合计 - 采购应付金额合计
+费用收入净额 = 其他收入合计 - 其他支出合计
+估算净利润 = 毛利润 + 费用收入净额
+```
+
+说明：该利润是经营估算，不是严格会计利润。第一版不包含 Excel 导出、自定义报表设计器和复杂 BI 图表。
+
 ## Docker Compose 启动
 
 ```bash

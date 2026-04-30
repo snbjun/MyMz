@@ -179,6 +179,56 @@ body {
   width: 260px;
 }
 
+.reports-toolbar {
+  flex-wrap: wrap;
+}
+
+.reports-toolbar .el-date-editor {
+  width: 260px;
+}
+
+.reports-toolbar .el-input {
+  width: 220px;
+}
+
+.report-card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 12px;
+  margin-bottom: 18px;
+}
+
+.report-card {
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  padding: 14px 16px;
+  background: #fff;
+}
+
+.report-card span {
+  display: block;
+  color: #6b7280;
+  font-size: 13px;
+  margin-bottom: 8px;
+}
+
+.report-card strong {
+  display: block;
+  color: #111827;
+  font-size: 22px;
+  line-height: 1.2;
+}
+
+.reports-page h3 {
+  margin: 18px 0 10px;
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.report-profit-grid {
+  margin-top: 16px;
+}
+
 .sales-form-grid,
 .purchase-form-grid {
   display: grid;
