@@ -413,6 +413,58 @@ cd backend
 alembic upgrade head
 ```
 
+## 备份恢复模块
+
+备份恢复页面路径：`http://localhost:8080/settings/backups`。所有备份恢复接口均需要登录，且只有超级管理员 `is_superuser = true` 可以操作；普通用户会被前端路由守卫拦截，后端也会返回无权限。
+
+备份对象：
+
+- SQLite 数据库文件，默认来自 `DATABASE_URL=sqlite:///../data/app.db`
+- 上传文件目录，默认 `data/uploads/`
+
+备份文件位置：
+
+- 默认存放在 `data/backups/`
+- Docker 部署时后端挂载 `./data:/app/data`，因此备份文件位于宿主机项目目录的 `data/backups/`
+- `data/backups/*.zip` 已被 `.gitignore` 忽略，不会提交到 GitHub
+
+备份文件格式：
+
+- 文件名：`mymz-backup-YYYYMMDD-HHMMSS.zip`
+- 恢复前安全备份文件名：`mymz-before-restore-YYYYMMDD-HHMMSS.zip`
+- zip 内部结构：
+
+```text
+manifest.json
+database/app.db
+uploads/...
+```
+
+`manifest.json` 包含应用名称、备份版本、创建时间、数据库文件名、是否包含上传目录和备注。备份 zip 不包含绝对路径，不包含 `..` 路径，也不会包含 `data/backups/` 或 `design_files/`。
+
+手动备份：
+
+- 前端点击“创建备份”
+- 或调用 `POST /api/backups`
+
+下载和删除：
+
+- 下载接口：`GET /api/backups/{filename}/download`
+- 删除接口：`DELETE /api/backups/{filename}`
+- 后端会限制文件必须位于 `data/backups/` 且必须是 `.zip`，防止路径穿越和误删其他文件
+
+恢复流程：
+
+1. 校验备份文件必须是 `data/backups/` 下的 `.zip`
+2. 校验 zip 内部路径不能是绝对路径，不能包含 `..`
+3. 校验必须包含 `manifest.json` 和 `database/app.db`
+4. 自动创建一次当前数据的恢复前安全备份
+5. 替换当前 SQLite 数据库文件
+6. 替换 `data/uploads/` 目录内容
+7. 返回恢复文件名和安全备份文件名
+
+恢复是文件级恢复，运行中的 SQLite 连接可能仍持有旧状态；恢复完成后建议重启后端服务。本阶段不包含云备份、定时备份和上传 zip 恢复。
+
 ## Docker Compose 启动
 
 ```bash

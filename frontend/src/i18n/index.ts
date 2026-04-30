@@ -371,6 +371,22 @@ const messages = {
   confirmedAt: "确认时间",
   customerSignature: "客户签字",
   supplierSignature: "供应商签字",
+  backupRestore: "备份恢复",
+  backupRestoreHint: "手动备份本地数据库和上传文件，并可从备份文件恢复。",
+  backupRestoreWarning: "恢复会替换当前数据库和上传文件，系统会自动创建恢复前安全备份，建议恢复后重启后端服务。",
+  createBackup: "创建备份",
+  downloadBackup: "下载",
+  backupFilename: "备份文件",
+  backupKind: "备份类型",
+  backupSize: "文件大小",
+  backupKindManual: "手动备份",
+  backupKindBeforeRestore: "恢复前备份",
+  backupKindUnknown: "未知",
+  manualBackupNote: "手动备份",
+  backupCreateSuccess: "备份创建成功",
+  backupDeleteConfirm: "确认删除该备份文件？",
+  backupRestoreConfirm: "恢复会替换当前数据库和上传文件，系统会自动创建恢复前安全备份，建议恢复后重启后端服务。确认继续？",
+  backupRestoreSuccess: "恢复完成，安全备份：",
 };
 
 export type MessageKey = keyof typeof messages;

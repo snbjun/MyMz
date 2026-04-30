@@ -11,6 +11,9 @@ class Settings(BaseSettings):
     app_env: str = "development"
     api_prefix: str = "/api"
     database_url: str = "sqlite:///../data/app.db"
+    data_dir: str = "../data"
+    uploads_dir: str = "../data/uploads"
+    backups_dir: str = "../data/backups"
     # 第 2 阶段新增：JWT 与初始化管理员配置，从“静态跳转登录”改为真实认证。
     secret_key: str = "change-this-secret-key-in-production"
     algorithm: str = "HS256"

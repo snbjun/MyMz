@@ -1,6 +1,7 @@
 from fastapi import APIRouter
 
 from app.modules.auth.router import router as auth_router
+from app.modules.backups.router import router as backups_router
 from app.modules.customers.router import router as customers_router
 from app.modules.finance.router import router as finance_router
 from app.modules.inventory.router import router as inventory_router
@@ -23,6 +24,7 @@ def health_check() -> dict[str, str]:
 
 
 router.include_router(auth_router, prefix="/auth", tags=["auth"])
+router.include_router(backups_router, tags=["backups"])
 router.include_router(customers_router, tags=["customers"])
 router.include_router(finance_router, tags=["finance"])
 router.include_router(inventory_router, tags=["inventory"])

@@ -14,6 +14,7 @@ import SalesOrderPrintView from "@/views/printing/SalesOrderPrintView.vue";
 import PurchaseOrderListView from "@/views/purchase/PurchaseOrderListView.vue";
 import ReportsView from "@/views/reports/ReportsView.vue";
 import SalesOrderListView from "@/views/sales/SalesOrderListView.vue";
+import BackupManagementView from "@/views/settings/BackupManagementView.vue";
 import SupplierManagementView from "@/views/suppliers/SupplierManagementView.vue";
 import UserManagementView from "@/views/users/UserManagementView.vue";
 
@@ -27,7 +28,7 @@ export const moduleRoutes = [
   { path: "finance", name: "finance", titleKey: "expenseIncome" },
   { path: "reports", name: "reports", titleKey: "reports" },
   { path: "users", name: "users", titleKey: "users" },
-  { path: "settings", name: "settings", titleKey: "settings" },
+  { path: "settings/backups", name: "settings", titleKey: "settings" },
 ] as const;
 
 const routes: RouteRecordRaw[] = [
@@ -69,8 +70,10 @@ const routes: RouteRecordRaw[] = [
                           ? FinanceManagementView
                           : route.name === "reports"
                             ? ReportsView
+                            : route.name === "settings"
+                              ? BackupManagementView
                           : PlaceholderView,
-        meta: { titleKey: route.titleKey, requiresSuperuser: route.name === "users" },
+        meta: { titleKey: route.titleKey, requiresSuperuser: route.name === "users" || route.name === "settings" },
       })),
     ],
   },
