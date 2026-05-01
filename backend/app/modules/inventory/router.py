@@ -1,9 +1,11 @@
 from datetime import date
 
-from fastapi import APIRouter, Depends, Query
+from fastapi import APIRouter, Depends, Query, Request
 from sqlalchemy.orm import Session
 
 from app.core.deps import get_current_user, get_db
+from app.core.permissions import Permission, require_permission
+from app.modules.audit_logs.service import record_audit_log
 from app.modules.inventory.model import Warehouse
 from app.modules.inventory.schemas import (
     InitialStockCreate,
@@ -45,19 +47,25 @@ def list_inventory(
 @router.post("/inventory/initial-stock", response_model=InventoryRead)
 def set_initial_stock(
     payload: InitialStockCreate,
+    request: Request,
     db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_user),
+    current_user: User = Depends(require_permission(Permission.INVENTORY_MANAGE)),
 ) -> InventoryRead:
-    return InventoryService(db).set_initial_stock(payload, current_user)
+    inventory = InventoryService(db).set_initial_stock(payload, current_user)
+    record_audit_log(db, current_user, "inventory", "initial_stock", f"设置期初库存：产品 {payload.product_id}", "product", payload.product_id, str(payload.product_id), request)
+    return inventory
 
 
 @router.post("/inventory/adjustments", response_model=InventoryRead)
 def adjust_inventory(
     payload: InventoryAdjustmentCreate,
+    request: Request,
     db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_user),
+    current_user: User = Depends(require_permission(Permission.INVENTORY_MANAGE)),
 ) -> InventoryRead:
-    return InventoryService(db).adjust_inventory(payload, current_user)
+    inventory = InventoryService(db).adjust_inventory(payload, current_user)
+    record_audit_log(db, current_user, "inventory", "adjust", f"库存调整：产品 {payload.product_id}", "product", payload.product_id, str(payload.product_id), request)
+    return inventory
 
 
 @router.get("/inventory/{product_id}", response_model=InventoryRead)

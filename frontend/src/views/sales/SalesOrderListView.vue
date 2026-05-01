@@ -17,10 +17,12 @@ import {
   updateSalesOrder,
 } from "@/api/sales";
 import { t } from "@/i18n";
+import { useAuthStore } from "@/stores/auth";
 import type { CustomerRecord } from "@/types/customer";
 import type { ProductRecord } from "@/types/product";
 import type { Warehouse } from "@/types/inventory";
 import type { SalesOrderDetail, SalesOrderListItem } from "@/types/sales";
+import { hasPermission, Permission } from "@/utils/permissions";
 
 interface SalesFormItem {
   product_id?: number;
@@ -38,6 +40,7 @@ interface SalesFormItem {
 
 const loading = ref(false);
 const router = useRouter();
+const authStore = useAuthStore();
 const customersLoading = ref(false);
 const productsLoading = ref(false);
 const tableData = ref<SalesOrderListItem[]>([]);
@@ -99,6 +102,7 @@ const paymentRules: FormRules = {
 const defaultWarehouseId = computed(() => warehouses.value.find((item) => item.is_default)?.id);
 const formTotalAmount = computed(() => form.items.reduce((sum, item) => sum + lineAmount(item), 0));
 const formReceivableAmount = computed(() => Math.max(0, formTotalAmount.value - form.discount_amount));
+const canManageSales = computed(() => hasPermission(authStore.user, Permission.SALES_MANAGE));
 
 function today() {
   return new Date().toISOString().slice(0, 10);
@@ -448,7 +452,7 @@ onMounted(async () => {
       <el-date-picker v-model="query.dateRange" type="daterange" value-format="YYYY-MM-DD" :start-placeholder="t('startDate')" :end-placeholder="t('endDate')" />
       <el-button type="primary" @click="handleSearch">{{ t("search") }}</el-button>
       <el-button @click="handleReset">{{ t("reset") }}</el-button>
-      <el-button type="success" @click="openCreateDialog">{{ t("addSalesOrder") }}</el-button>
+      <el-button v-if="canManageSales" type="success" @click="openCreateDialog">{{ t("addSalesOrder") }}</el-button>
     </div>
 
     <el-table v-loading="loading" :data="tableData" border class="data-table" :empty-text="t('noData')">
@@ -473,13 +477,13 @@ onMounted(async () => {
       </el-table-column>
       <el-table-column :label="t('actions')" fixed="right" width="320">
         <template #default="{ row }">
-          <el-button v-if="row.status !== 'draft'" size="small" @click="openDetail(row)">{{ t("detail") }}</el-button>
-          <el-button v-if="row.status === 'draft'" size="small" @click="openEditDialog(row)">{{ t("edit") }}</el-button>
-          <el-button v-if="row.status === 'draft'" size="small" type="primary" @click="handleConfirm(row)">{{ t("confirmSalesOrder") }}</el-button>
-          <el-button v-if="row.status === 'confirmed'" size="small" @click="openShipDialog(row)">{{ t("shipSalesOrder") }}</el-button>
-          <el-button v-if="row.status === 'confirmed'" size="small" @click="openPaymentDialog(row)">{{ t("receivePayment") }}</el-button>
+          <el-button v-if="row.status !== 'draft' || !canManageSales" size="small" @click="openDetail(row)">{{ t("detail") }}</el-button>
+          <el-button v-if="canManageSales && row.status === 'draft'" size="small" @click="openEditDialog(row)">{{ t("edit") }}</el-button>
+          <el-button v-if="canManageSales && row.status === 'draft'" size="small" type="primary" @click="handleConfirm(row)">{{ t("confirmSalesOrder") }}</el-button>
+          <el-button v-if="canManageSales && row.status === 'confirmed'" size="small" @click="openShipDialog(row)">{{ t("shipSalesOrder") }}</el-button>
+          <el-button v-if="canManageSales && row.status === 'confirmed'" size="small" @click="openPaymentDialog(row)">{{ t("receivePayment") }}</el-button>
           <el-button size="small" @click="handlePrint(row)">{{ t("print") }}</el-button>
-          <el-button v-if="row.status !== 'cancelled'" size="small" type="danger" @click="handleCancel(row)">{{ t("cancelSalesOrder") }}</el-button>
+          <el-button v-if="canManageSales && row.status !== 'cancelled'" size="small" type="danger" @click="handleCancel(row)">{{ t("cancelSalesOrder") }}</el-button>
         </template>
       </el-table-column>
     </el-table>

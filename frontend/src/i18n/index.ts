@@ -387,6 +387,20 @@ const messages = {
   backupDeleteConfirm: "确认删除该备份文件？",
   backupRestoreConfirm: "恢复会替换当前数据库和上传文件，系统会自动创建恢复前安全备份，建议恢复后重启后端服务。确认继续？",
   backupRestoreSuccess: "恢复完成，安全备份：",
+  auditLogs: "操作日志",
+  auditLogDetail: "操作日志详情",
+  auditKeywordPlaceholder: "搜索用户、摘要、对象或路径",
+  auditUserId: "用户 ID",
+  auditModule: "模块",
+  auditAction: "动作",
+  auditTargetType: "对象类型",
+  auditTargetId: "对象 ID",
+  auditTarget: "对象",
+  auditIpAddress: "IP",
+  auditUserAgent: "User-Agent",
+  auditMethod: "请求方法",
+  auditPath: "请求路径",
+  auditSummary: "摘要",
 };
 
 export type MessageKey = keyof typeof messages;

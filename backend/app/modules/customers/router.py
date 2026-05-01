@@ -1,7 +1,9 @@
-from fastapi import APIRouter, Depends, Query
+from fastapi import APIRouter, Depends, Query, Request
 from sqlalchemy.orm import Session
 
 from app.core.deps import get_current_user, get_db
+from app.core.permissions import Permission, require_permission
+from app.modules.audit_logs.service import record_audit_log
 from app.modules.customers.model import Customer, CustomerCategory
 from app.modules.customers.schemas import (
     CustomerCategoryCreate,
@@ -30,29 +32,37 @@ def list_customer_categories(
 @router.post("/customer-categories", response_model=CustomerCategoryRead)
 def create_customer_category(
     payload: CustomerCategoryCreate,
+    request: Request,
     db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_user),
+    current_user: User = Depends(require_permission(Permission.CUSTOMERS_MANAGE)),
 ) -> CustomerCategory:
-    return CustomerService(db).create_category(payload)
+    category = CustomerService(db).create_category(payload)
+    record_audit_log(db, current_user, "customers", "create_category", f"创建客户分类：{category.name}", "customer_category", category.id, category.name, request)
+    return category
 
 
 @router.put("/customer-categories/{category_id}", response_model=CustomerCategoryRead)
 def update_customer_category(
     category_id: int,
     payload: CustomerCategoryUpdate,
+    request: Request,
     db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_user),
+    current_user: User = Depends(require_permission(Permission.CUSTOMERS_MANAGE)),
 ) -> CustomerCategory:
-    return CustomerService(db).update_category(category_id, payload)
+    category = CustomerService(db).update_category(category_id, payload)
+    record_audit_log(db, current_user, "customers", "update_category", f"编辑客户分类：{category.name}", "customer_category", category.id, category.name, request)
+    return category
 
 
 @router.delete("/customer-categories/{category_id}", response_model=SuccessResponse)
 def delete_customer_category(
     category_id: int,
+    request: Request,
     db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_user),
+    current_user: User = Depends(require_permission(Permission.CUSTOMERS_MANAGE)),
 ) -> SuccessResponse:
     CustomerService(db).delete_category(category_id)
+    record_audit_log(db, current_user, "customers", "delete_category", f"删除客户分类：{category_id}", "customer_category", category_id, str(category_id), request)
     return SuccessResponse()
 
 
@@ -72,10 +82,13 @@ def list_customers(
 @router.post("/customers", response_model=CustomerRead)
 def create_customer(
     payload: CustomerCreate,
+    request: Request,
     db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_user),
+    current_user: User = Depends(require_permission(Permission.CUSTOMERS_MANAGE)),
 ) -> Customer:
-    return CustomerService(db).create_customer(payload)
+    customer = CustomerService(db).create_customer(payload)
+    record_audit_log(db, current_user, "customers", "create", f"创建客户：{customer.name}", "customer", customer.id, customer.name, request)
+    return customer
 
 
 @router.get("/customers/{customer_id}", response_model=CustomerRead)
@@ -91,26 +104,35 @@ def get_customer(
 def update_customer(
     customer_id: int,
     payload: CustomerUpdate,
+    request: Request,
     db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_user),
+    current_user: User = Depends(require_permission(Permission.CUSTOMERS_MANAGE)),
 ) -> Customer:
-    return CustomerService(db).update_customer(customer_id, payload)
+    customer = CustomerService(db).update_customer(customer_id, payload)
+    record_audit_log(db, current_user, "customers", "update", f"编辑客户：{customer.name}", "customer", customer.id, customer.name, request)
+    return customer
 
 
 @router.delete("/customers/{customer_id}", response_model=SuccessResponse)
 def delete_customer(
     customer_id: int,
+    request: Request,
     db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_user),
+    current_user: User = Depends(require_permission(Permission.CUSTOMERS_MANAGE)),
 ) -> SuccessResponse:
+    customer = CustomerService(db).get_customer(customer_id)
     CustomerService(db).delete_customer(customer_id)
+    record_audit_log(db, current_user, "customers", "delete", f"删除客户：{customer.name}", "customer", customer.id, customer.name, request)
     return SuccessResponse()
 
 
 @router.post("/customers/{customer_id}/toggle-active", response_model=CustomerRead)
 def toggle_customer_active(
     customer_id: int,
+    request: Request,
     db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_user),
+    current_user: User = Depends(require_permission(Permission.CUSTOMERS_MANAGE)),
 ) -> Customer:
-    return CustomerService(db).toggle_active(customer_id)
+    customer = CustomerService(db).toggle_active(customer_id)
+    record_audit_log(db, current_user, "customers", "toggle_active", f"启用禁用客户：{customer.name}", "customer", customer.id, customer.name, request)
+    return customer

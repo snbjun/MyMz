@@ -1,5 +1,6 @@
 from fastapi import APIRouter
 
+from app.modules.audit_logs.router import router as audit_logs_router
 from app.modules.auth.router import router as auth_router
 from app.modules.backups.router import router as backups_router
 from app.modules.customers.router import router as customers_router
@@ -23,6 +24,7 @@ def health_check() -> dict[str, str]:
     return {"status": "ok", "service": "mymz-backend"}
 
 
+router.include_router(audit_logs_router, tags=["audit_logs"])
 router.include_router(auth_router, prefix="/auth", tags=["auth"])
 router.include_router(backups_router, tags=["backups"])
 router.include_router(customers_router, tags=["customers"])

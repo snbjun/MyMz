@@ -3,7 +3,8 @@ from datetime import date
 from fastapi import APIRouter, Depends, Query
 from sqlalchemy.orm import Session
 
-from app.core.deps import get_current_user, get_db
+from app.core.deps import get_db
+from app.core.permissions import Permission, require_permission
 from app.modules.reports.schemas import (
     FinanceByCategoryResponse,
     FinanceSummary,
@@ -21,9 +22,10 @@ from app.modules.reports.schemas import (
     SalesSummary,
 )
 from app.modules.reports.service import ReportService
-from app.modules.users.model import User
 
 router = APIRouter(prefix="/reports")
+
+require_reports_view = require_permission(Permission.REPORTS_VIEW)
 
 
 @router.get("/overview", response_model=OverviewResponse)
@@ -31,7 +33,7 @@ def overview(
     start_date: date | None = None,
     end_date: date | None = None,
     db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_user),
+    current_user=Depends(require_reports_view),
 ) -> OverviewResponse:
     return ReportService(db).overview(start_date, end_date)
 
@@ -41,7 +43,7 @@ def sales_summary(
     start_date: date | None = None,
     end_date: date | None = None,
     db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_user),
+    current_user=Depends(require_reports_view),
 ) -> SalesSummary:
     return ReportService(db).sales_summary(start_date, end_date)
 
@@ -53,7 +55,7 @@ def sales_by_customer(
     page: int = Query(default=1, ge=1),
     page_size: int = Query(default=20, ge=1, le=100),
     db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_user),
+    current_user=Depends(require_reports_view),
 ) -> SalesByCustomerResponse:
     return ReportService(db).sales_by_customer(start_date, end_date, page, page_size)
 
@@ -65,7 +67,7 @@ def sales_by_product(
     page: int = Query(default=1, ge=1),
     page_size: int = Query(default=20, ge=1, le=100),
     db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_user),
+    current_user=Depends(require_reports_view),
 ) -> SalesByProductResponse:
     return ReportService(db).sales_by_product(start_date, end_date, page, page_size)
 
@@ -75,7 +77,7 @@ def purchase_summary(
     start_date: date | None = None,
     end_date: date | None = None,
     db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_user),
+    current_user=Depends(require_reports_view),
 ) -> PurchaseSummary:
     return ReportService(db).purchase_summary(start_date, end_date)
 
@@ -87,7 +89,7 @@ def purchase_by_supplier(
     page: int = Query(default=1, ge=1),
     page_size: int = Query(default=20, ge=1, le=100),
     db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_user),
+    current_user=Depends(require_reports_view),
 ) -> PurchaseBySupplierResponse:
     return ReportService(db).purchase_by_supplier(start_date, end_date, page, page_size)
 
@@ -99,7 +101,7 @@ def purchase_by_product(
     page: int = Query(default=1, ge=1),
     page_size: int = Query(default=20, ge=1, le=100),
     db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_user),
+    current_user=Depends(require_reports_view),
 ) -> PurchaseByProductResponse:
     return ReportService(db).purchase_by_product(start_date, end_date, page, page_size)
 
@@ -111,7 +113,7 @@ def receivables(
     page: int = Query(default=1, ge=1),
     page_size: int = Query(default=20, ge=1, le=100),
     db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_user),
+    current_user=Depends(require_reports_view),
 ) -> ReceivableResponse:
     return ReportService(db).receivables(keyword, include_zero, page, page_size)
 
@@ -123,7 +125,7 @@ def payables(
     page: int = Query(default=1, ge=1),
     page_size: int = Query(default=20, ge=1, le=100),
     db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_user),
+    current_user=Depends(require_reports_view),
 ) -> PayableResponse:
     return ReportService(db).payables(keyword, include_zero, page, page_size)
 
@@ -131,7 +133,7 @@ def payables(
 @router.get("/inventory/summary", response_model=InventorySummary)
 def inventory_summary(
     db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_user),
+    current_user=Depends(require_reports_view),
 ) -> InventorySummary:
     return ReportService(db).inventory_summary()
 
@@ -141,7 +143,7 @@ def inventory_movement_summary(
     start_date: date | None = None,
     end_date: date | None = None,
     db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_user),
+    current_user=Depends(require_reports_view),
 ) -> InventoryMovementSummary:
     return ReportService(db).inventory_movement_summary(start_date, end_date)
 
@@ -151,7 +153,7 @@ def finance_summary(
     start_date: date | None = None,
     end_date: date | None = None,
     db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_user),
+    current_user=Depends(require_reports_view),
 ) -> FinanceSummary:
     return ReportService(db).finance_summary(start_date, end_date)
 
@@ -163,7 +165,7 @@ def finance_by_category(
     page: int = Query(default=1, ge=1),
     page_size: int = Query(default=20, ge=1, le=100),
     db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_user),
+    current_user=Depends(require_reports_view),
 ) -> FinanceByCategoryResponse:
     return ReportService(db).finance_by_category(start_date, end_date, page, page_size)
 
@@ -173,6 +175,6 @@ def profit(
     start_date: date | None = None,
     end_date: date | None = None,
     db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_user),
+    current_user=Depends(require_reports_view),
 ) -> ProfitSummary:
     return ReportService(db).profit(start_date, end_date)

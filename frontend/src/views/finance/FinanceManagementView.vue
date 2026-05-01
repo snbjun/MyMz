@@ -19,6 +19,7 @@ import {
   voidFinanceRecord,
 } from "@/api/finance";
 import { t } from "@/i18n";
+import { useAuthStore } from "@/stores/auth";
 import type {
   FinanceAccount,
   FinanceAccountPayload,
@@ -29,7 +30,9 @@ import type {
   FinanceRecordStatus,
   FinanceType,
 } from "@/types/finance";
+import { hasPermission, Permission } from "@/utils/permissions";
 
+const authStore = useAuthStore();
 const activeTab = ref("records");
 const recordsLoading = ref(false);
 const accountsLoading = ref(false);
@@ -48,6 +51,7 @@ const currentRecord = ref<FinanceRecord | null>(null);
 const recordFormRef = ref<FormInstance>();
 const accountFormRef = ref<FormInstance>();
 const categoryFormRef = ref<FormInstance>();
+const canManageFinance = computed(() => hasPermission(authStore.user, Permission.FINANCE_MANAGE));
 
 const query = reactive({
   keyword: "",
@@ -413,8 +417,8 @@ onMounted(refreshAll);
           <el-date-picker v-model="query.dateRange" type="daterange" value-format="YYYY-MM-DD" :start-placeholder="t('startDate')" :end-placeholder="t('endDate')" />
           <el-button type="primary" @click="handleSearch">{{ t("search") }}</el-button>
           <el-button @click="handleReset">{{ t("reset") }}</el-button>
-          <el-button type="success" @click="openRecordDialog('income')">{{ t("addIncome") }}</el-button>
-          <el-button type="warning" @click="openRecordDialog('expense')">{{ t("addExpense") }}</el-button>
+          <el-button v-if="canManageFinance" type="success" @click="openRecordDialog('income')">{{ t("addIncome") }}</el-button>
+          <el-button v-if="canManageFinance" type="warning" @click="openRecordDialog('expense')">{{ t("addExpense") }}</el-button>
         </div>
 
         <el-table v-loading="recordsLoading" :data="records" border class="data-table" :empty-text="t('noData')">
@@ -441,7 +445,7 @@ onMounted(refreshAll);
           <el-table-column :label="t('actions')" fixed="right" width="150">
             <template #default="{ row }">
               <el-button size="small" @click="openRecordDetail(row)">{{ t("detail") }}</el-button>
-              <el-button v-if="row.status === 'normal'" size="small" type="danger" @click="handleVoidRecord(row)">{{ t("financeVoidRecord") }}</el-button>
+              <el-button v-if="canManageFinance && row.status === 'normal'" size="small" type="danger" @click="handleVoidRecord(row)">{{ t("financeVoidRecord") }}</el-button>
             </template>
           </el-table-column>
         </el-table>
@@ -460,7 +464,7 @@ onMounted(refreshAll);
 
       <el-tab-pane :label="t('financeAccounts')" name="accounts">
         <div class="table-toolbar">
-          <el-button type="primary" @click="openAccountCreate">{{ t("addFinanceAccount") }}</el-button>
+          <el-button v-if="canManageFinance" type="primary" @click="openAccountCreate">{{ t("addFinanceAccount") }}</el-button>
         </div>
         <el-table v-loading="accountsLoading" :data="accounts" border class="data-table" :empty-text="t('noData')">
           <el-table-column prop="name" :label="t('financeAccountName')" min-width="150" />
@@ -481,9 +485,9 @@ onMounted(refreshAll);
           </el-table-column>
           <el-table-column :label="t('actions')" fixed="right" width="220">
             <template #default="{ row }">
-              <el-button size="small" @click="openAccountEdit(row)">{{ t("edit") }}</el-button>
-              <el-button size="small" @click="handleToggleAccount(row)">{{ row.is_active ? t("disable") : t("enable") }}</el-button>
-              <el-button size="small" type="danger" @click="handleDeleteAccount(row)">{{ t("delete") }}</el-button>
+              <el-button v-if="canManageFinance" size="small" @click="openAccountEdit(row)">{{ t("edit") }}</el-button>
+              <el-button v-if="canManageFinance" size="small" @click="handleToggleAccount(row)">{{ row.is_active ? t("disable") : t("enable") }}</el-button>
+              <el-button v-if="canManageFinance" size="small" type="danger" @click="handleDeleteAccount(row)">{{ t("delete") }}</el-button>
             </template>
           </el-table-column>
         </el-table>
@@ -491,7 +495,7 @@ onMounted(refreshAll);
 
       <el-tab-pane :label="t('financeCategories')" name="categories">
         <div class="table-toolbar">
-          <el-button type="primary" @click="openCategoryCreate">{{ t("addFinanceCategory") }}</el-button>
+          <el-button v-if="canManageFinance" type="primary" @click="openCategoryCreate">{{ t("addFinanceCategory") }}</el-button>
         </div>
         <el-table v-loading="categoriesLoading" :data="categories" border class="data-table" :empty-text="t('noData')">
           <el-table-column prop="name" :label="t('categoryName')" min-width="150" />
@@ -512,9 +516,9 @@ onMounted(refreshAll);
           </el-table-column>
           <el-table-column :label="t('actions')" fixed="right" width="220">
             <template #default="{ row }">
-              <el-button size="small" @click="openCategoryEdit(row)">{{ t("edit") }}</el-button>
-              <el-button size="small" @click="handleToggleCategory(row)">{{ row.is_active ? t("disable") : t("enable") }}</el-button>
-              <el-button size="small" type="danger" @click="handleDeleteCategory(row)">{{ t("delete") }}</el-button>
+              <el-button v-if="canManageFinance" size="small" @click="openCategoryEdit(row)">{{ t("edit") }}</el-button>
+              <el-button v-if="canManageFinance" size="small" @click="handleToggleCategory(row)">{{ row.is_active ? t("disable") : t("enable") }}</el-button>
+              <el-button v-if="canManageFinance" size="small" type="danger" @click="handleDeleteCategory(row)">{{ t("delete") }}</el-button>
             </template>
           </el-table-column>
         </el-table>

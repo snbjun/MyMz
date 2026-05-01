@@ -14,8 +14,11 @@ import {
   updateSupplierCategory,
 } from "@/api/suppliers";
 import { t } from "@/i18n";
+import { useAuthStore } from "@/stores/auth";
 import type { SupplierCategory, SupplierPayload, SupplierRecord } from "@/types/supplier";
+import { hasPermission, Permission } from "@/utils/permissions";
 
+const authStore = useAuthStore();
 const loading = ref(false);
 const categoriesLoading = ref(false);
 const tableData = ref<SupplierRecord[]>([]);
@@ -27,6 +30,7 @@ const supplierEditing = ref(false);
 const categoryEditingId = ref<number | null>(null);
 const supplierFormRef = ref<FormInstance>();
 const categoryFormRef = ref<FormInstance>();
+const canManageSuppliers = computed(() => hasPermission(authStore.user, Permission.SUPPLIERS_MANAGE));
 
 const query = reactive({
   keyword: "",
@@ -275,8 +279,8 @@ onMounted(async () => {
       </el-select>
       <el-button type="primary" @click="handleSearch">{{ t("search") }}</el-button>
       <el-button @click="handleReset">{{ t("reset") }}</el-button>
-      <el-button type="success" @click="openCreateSupplierDialog">{{ t("addSupplier") }}</el-button>
-      <el-button @click="openCategoryDialog">{{ t("categoryManage") }}</el-button>
+      <el-button v-if="canManageSuppliers" type="success" @click="openCreateSupplierDialog">{{ t("addSupplier") }}</el-button>
+      <el-button v-if="canManageSuppliers" @click="openCategoryDialog">{{ t("categoryManage") }}</el-button>
     </div>
 
     <el-table v-loading="loading" :data="tableData" border class="data-table" :empty-text="t('noData')">
@@ -298,9 +302,9 @@ onMounted(async () => {
       </el-table-column>
       <el-table-column :label="t('actions')" fixed="right" width="220">
         <template #default="{ row }">
-          <el-button size="small" @click="openEditSupplierDialog(row)">{{ t("edit") }}</el-button>
-          <el-button size="small" @click="handleToggle(row)">{{ row.is_active ? t("disable") : t("enable") }}</el-button>
-          <el-button size="small" type="danger" @click="handleDelete(row)">{{ t("delete") }}</el-button>
+          <el-button v-if="canManageSuppliers" size="small" @click="openEditSupplierDialog(row)">{{ t("edit") }}</el-button>
+          <el-button v-if="canManageSuppliers" size="small" @click="handleToggle(row)">{{ row.is_active ? t("disable") : t("enable") }}</el-button>
+          <el-button v-if="canManageSuppliers" size="small" type="danger" @click="handleDelete(row)">{{ t("delete") }}</el-button>
         </template>
       </el-table-column>
     </el-table>

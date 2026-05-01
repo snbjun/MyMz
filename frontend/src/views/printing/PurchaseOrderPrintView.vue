@@ -5,17 +5,21 @@ import { useRoute, useRouter } from "vue-router";
 
 import { getPurchaseOrderPrintData, updatePrintSetting } from "@/api/printing";
 import { t } from "@/i18n";
+import { useAuthStore } from "@/stores/auth";
 import type { PrintSettingPayload, PurchaseOrderPrintData } from "@/types/printing";
+import { hasPermission, Permission } from "@/utils/permissions";
 import PrintSettingsDialog from "@/views/printing/components/PrintSettingsDialog.vue";
 
 const route = useRoute();
 const router = useRouter();
+const authStore = useAuthStore();
 const loading = ref(false);
 const data = ref<PurchaseOrderPrintData | null>(null);
 const settingsVisible = ref(false);
 
 const settings = computed(() => data.value?.print_settings ?? null);
 const showCancelled = computed(() => data.value?.status === "cancelled");
+const canManagePrinting = computed(() => hasPermission(authStore.user, Permission.PRINTING_MANAGE));
 
 function money(value?: string | null) {
   return Number(value ?? 0).toFixed(2);
@@ -67,7 +71,7 @@ onMounted(fetchData);
   <section class="print-page" v-loading="loading">
     <div class="print-toolbar">
       <el-button @click="router.back()">{{ t("back") }}</el-button>
-      <el-button @click="settingsVisible = true">{{ t("printSettings") }}</el-button>
+      <el-button v-if="canManagePrinting" @click="settingsVisible = true">{{ t("printSettings") }}</el-button>
       <el-button type="primary" @click="printPage">{{ t("print") }}</el-button>
     </div>
 

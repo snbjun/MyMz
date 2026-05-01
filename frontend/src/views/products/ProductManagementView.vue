@@ -18,8 +18,11 @@ import {
   updateProductUnit,
 } from "@/api/products";
 import { t } from "@/i18n";
+import { useAuthStore } from "@/stores/auth";
 import type { ProductCategory, ProductPayload, ProductRecord, ProductUnit } from "@/types/product";
+import { hasPermission, Permission } from "@/utils/permissions";
 
+const authStore = useAuthStore();
 const loading = ref(false);
 const categoriesLoading = ref(false);
 const unitsLoading = ref(false);
@@ -36,6 +39,7 @@ const unitEditingId = ref<number | null>(null);
 const productFormRef = ref<FormInstance>();
 const categoryFormRef = ref<FormInstance>();
 const unitFormRef = ref<FormInstance>();
+const canManageProducts = computed(() => hasPermission(authStore.user, Permission.PRODUCTS_MANAGE));
 
 const query = reactive({
   keyword: "",
@@ -362,9 +366,9 @@ onMounted(async () => {
       </el-select>
       <el-button type="primary" @click="handleSearch">{{ t("search") }}</el-button>
       <el-button @click="handleReset">{{ t("reset") }}</el-button>
-      <el-button type="success" @click="openCreateProductDialog">{{ t("addProduct") }}</el-button>
-      <el-button @click="openCategoryDialog">{{ t("categoryManage") }}</el-button>
-      <el-button @click="openUnitDialog">{{ t("unitManage") }}</el-button>
+      <el-button v-if="canManageProducts" type="success" @click="openCreateProductDialog">{{ t("addProduct") }}</el-button>
+      <el-button v-if="canManageProducts" @click="openCategoryDialog">{{ t("categoryManage") }}</el-button>
+      <el-button v-if="canManageProducts" @click="openUnitDialog">{{ t("unitManage") }}</el-button>
     </div>
 
     <el-table v-loading="loading" :data="tableData" border class="data-table" :empty-text="t('noData')">
@@ -389,9 +393,9 @@ onMounted(async () => {
       </el-table-column>
       <el-table-column :label="t('actions')" fixed="right" width="220">
         <template #default="{ row }">
-          <el-button size="small" @click="openEditProductDialog(row)">{{ t("edit") }}</el-button>
-          <el-button size="small" @click="handleToggle(row)">{{ row.is_active ? t("disable") : t("enable") }}</el-button>
-          <el-button size="small" type="danger" @click="handleDelete(row)">{{ t("delete") }}</el-button>
+          <el-button v-if="canManageProducts" size="small" @click="openEditProductDialog(row)">{{ t("edit") }}</el-button>
+          <el-button v-if="canManageProducts" size="small" @click="handleToggle(row)">{{ row.is_active ? t("disable") : t("enable") }}</el-button>
+          <el-button v-if="canManageProducts" size="small" type="danger" @click="handleDelete(row)">{{ t("delete") }}</el-button>
         </template>
       </el-table-column>
     </el-table>

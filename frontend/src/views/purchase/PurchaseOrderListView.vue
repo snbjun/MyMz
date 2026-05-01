@@ -17,10 +17,12 @@ import {
   updatePurchaseOrder,
 } from "@/api/purchase";
 import { t } from "@/i18n";
+import { useAuthStore } from "@/stores/auth";
 import type { SupplierRecord } from "@/types/supplier";
 import type { ProductRecord } from "@/types/product";
 import type { Warehouse } from "@/types/inventory";
 import type { PurchaseOrderDetail, PurchaseOrderListItem } from "@/types/purchase";
+import { hasPermission, Permission } from "@/utils/permissions";
 
 interface PurchaseFormItem {
   product_id?: number;
@@ -38,6 +40,7 @@ interface PurchaseFormItem {
 
 const loading = ref(false);
 const router = useRouter();
+const authStore = useAuthStore();
 const suppliersLoading = ref(false);
 const productsLoading = ref(false);
 const tableData = ref<PurchaseOrderListItem[]>([]);
@@ -99,6 +102,7 @@ const paymentRules: FormRules = {
 const defaultWarehouseId = computed(() => warehouses.value.find((item) => item.is_default)?.id);
 const formTotalAmount = computed(() => form.items.reduce((sum, item) => sum + lineAmount(item), 0));
 const formPayableAmount = computed(() => Math.max(0, formTotalAmount.value - form.discount_amount));
+const canManagePurchase = computed(() => hasPermission(authStore.user, Permission.PURCHASE_MANAGE));
 
 function today() {
   return new Date().toISOString().slice(0, 10);
@@ -448,7 +452,7 @@ onMounted(async () => {
       <el-date-picker v-model="query.dateRange" type="daterange" value-format="YYYY-MM-DD" :start-placeholder="t('startDate')" :end-placeholder="t('endDate')" />
       <el-button type="primary" @click="handleSearch">{{ t("search") }}</el-button>
       <el-button @click="handleReset">{{ t("reset") }}</el-button>
-      <el-button type="success" @click="openCreateDialog">{{ t("addPurchaseOrder") }}</el-button>
+      <el-button v-if="canManagePurchase" type="success" @click="openCreateDialog">{{ t("addPurchaseOrder") }}</el-button>
     </div>
 
     <el-table v-loading="loading" :data="tableData" border class="data-table" :empty-text="t('noData')">
@@ -473,13 +477,13 @@ onMounted(async () => {
       </el-table-column>
       <el-table-column :label="t('actions')" fixed="right" width="320">
         <template #default="{ row }">
-          <el-button v-if="row.status !== 'draft'" size="small" @click="openDetail(row)">{{ t("detail") }}</el-button>
-          <el-button v-if="row.status === 'draft'" size="small" @click="openEditDialog(row)">{{ t("edit") }}</el-button>
-          <el-button v-if="row.status === 'draft'" size="small" type="primary" @click="handleConfirm(row)">{{ t("confirmPurchaseOrder") }}</el-button>
-          <el-button v-if="row.status === 'confirmed'" size="small" @click="openReceiveDialog(row)">{{ t("receivePurchaseOrder") }}</el-button>
-          <el-button v-if="row.status === 'confirmed'" size="small" @click="openPaymentDialog(row)">{{ t("payPurchaseOrder") }}</el-button>
+          <el-button v-if="row.status !== 'draft' || !canManagePurchase" size="small" @click="openDetail(row)">{{ t("detail") }}</el-button>
+          <el-button v-if="canManagePurchase && row.status === 'draft'" size="small" @click="openEditDialog(row)">{{ t("edit") }}</el-button>
+          <el-button v-if="canManagePurchase && row.status === 'draft'" size="small" type="primary" @click="handleConfirm(row)">{{ t("confirmPurchaseOrder") }}</el-button>
+          <el-button v-if="canManagePurchase && row.status === 'confirmed'" size="small" @click="openReceiveDialog(row)">{{ t("receivePurchaseOrder") }}</el-button>
+          <el-button v-if="canManagePurchase && row.status === 'confirmed'" size="small" @click="openPaymentDialog(row)">{{ t("payPurchaseOrder") }}</el-button>
           <el-button size="small" @click="handlePrint(row)">{{ t("print") }}</el-button>
-          <el-button v-if="row.status !== 'cancelled'" size="small" type="danger" @click="handleCancel(row)">{{ t("cancelPurchaseOrder") }}</el-button>
+          <el-button v-if="canManagePurchase && row.status !== 'cancelled'" size="small" type="danger" @click="handleCancel(row)">{{ t("cancelPurchaseOrder") }}</el-button>
         </template>
       </el-table-column>
     </el-table>

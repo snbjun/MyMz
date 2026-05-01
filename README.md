@@ -465,6 +465,35 @@ uploads/...
 
 恢复是文件级恢复，运行中的 SQLite 连接可能仍持有旧状态；恢复完成后建议重启后端服务。本阶段不包含云备份、定时备份和上传 zip 恢复。
 
+## 权限与操作日志
+
+本阶段新增轻量角色权限和操作日志，页面路径为 `http://localhost:8080/audit-logs`，后端接口为 `GET /api/audit-logs` 和 `GET /api/audit-logs/{id}`。
+
+角色规则：
+- `is_superuser = true`：拥有所有权限，包括用户管理、备份恢复、权限配置和操作日志查看。
+- `role = admin`：拥有除备份恢复外的大部分管理权限，可以查看操作日志。
+- `role = staff`：拥有客户、供应商、产品、库存、销售单、采购单、费用收入、报表、打印等业务权限，不能管理用户、备份恢复、权限配置和操作日志。
+- `role = viewer`：只读角色，可以查看客户、供应商、产品、库存、销售单、采购单、费用收入、报表和打印数据，不能新增、编辑、删除、确认、作废、收付款或库存调整。
+
+权限常量集中定义在后端 `app/core/permissions.py`，包括：
+- `users.manage`
+- `customers.manage`
+- `suppliers.manage`
+- `products.manage`
+- `inventory.manage`
+- `sales.manage`
+- `purchase.manage`
+- `finance.manage`
+- `reports.view`
+- `printing.manage`
+- `backups.manage`
+- `audit_logs.view`
+- `settings.manage`
+
+备份恢复仍然只允许超级管理员操作，不开放给 `admin`、`staff` 或 `viewer`。
+
+操作日志记录范围包括登录成功、用户管理、客户/供应商/产品写操作、库存期初与调整、销售单关键动作、采购单关键动作、费用收入关键动作、备份创建/恢复/删除、打印配置更新等。操作日志不记录密码、token 或完整敏感请求体，只保存模块、动作、对象、路径、IP、User-Agent 和简短摘要。
+
 ## Docker Compose 启动
 
 ```bash

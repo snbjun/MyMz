@@ -1,9 +1,11 @@
 from datetime import date
 
-from fastapi import APIRouter, Depends, Query
+from fastapi import APIRouter, Depends, Query, Request
 from sqlalchemy.orm import Session
 
 from app.core.deps import get_current_user, get_db
+from app.core.permissions import Permission, require_permission
+from app.modules.audit_logs.service import record_audit_log
 from app.modules.finance.schemas import (
     FinanceAccountCreate,
     FinanceAccountRead,
@@ -36,39 +38,50 @@ def list_finance_categories(
 @router.post("/finance-categories", response_model=FinanceCategoryRead)
 def create_finance_category(
     payload: FinanceCategoryCreate,
+    request: Request,
     db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_user),
+    current_user: User = Depends(require_permission(Permission.FINANCE_MANAGE)),
 ) -> FinanceCategoryRead:
-    return FinanceService(db).create_category(payload)
+    category = FinanceService(db).create_category(payload)
+    record_audit_log(db, current_user, "finance", "create_category", f"创建收支分类：{category.name}", "finance_category", category.id, category.name, request)
+    return category
 
 
 @router.put("/finance-categories/{category_id}", response_model=FinanceCategoryRead)
 def update_finance_category(
     category_id: int,
     payload: FinanceCategoryUpdate,
+    request: Request,
     db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_user),
+    current_user: User = Depends(require_permission(Permission.FINANCE_MANAGE)),
 ) -> FinanceCategoryRead:
-    return FinanceService(db).update_category(category_id, payload)
+    category = FinanceService(db).update_category(category_id, payload)
+    record_audit_log(db, current_user, "finance", "update_category", f"编辑收支分类：{category.name}", "finance_category", category.id, category.name, request)
+    return category
 
 
 @router.delete("/finance-categories/{category_id}", response_model=SuccessResponse)
 def delete_finance_category(
     category_id: int,
+    request: Request,
     db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_user),
+    current_user: User = Depends(require_permission(Permission.FINANCE_MANAGE)),
 ) -> SuccessResponse:
     FinanceService(db).delete_category(category_id)
+    record_audit_log(db, current_user, "finance", "delete_category", f"删除收支分类：{category_id}", "finance_category", category_id, str(category_id), request)
     return SuccessResponse()
 
 
 @router.post("/finance-categories/{category_id}/toggle-active", response_model=FinanceCategoryRead)
 def toggle_finance_category_active(
     category_id: int,
+    request: Request,
     db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_user),
+    current_user: User = Depends(require_permission(Permission.FINANCE_MANAGE)),
 ) -> FinanceCategoryRead:
-    return FinanceService(db).toggle_category_active(category_id)
+    category = FinanceService(db).toggle_category_active(category_id)
+    record_audit_log(db, current_user, "finance", "toggle_category", f"启用禁用收支分类：{category.name}", "finance_category", category.id, category.name, request)
+    return category
 
 
 @router.get("/finance-accounts", response_model=list[FinanceAccountRead])
@@ -83,10 +96,13 @@ def list_finance_accounts(
 @router.post("/finance-accounts", response_model=FinanceAccountRead)
 def create_finance_account(
     payload: FinanceAccountCreate,
+    request: Request,
     db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_user),
+    current_user: User = Depends(require_permission(Permission.FINANCE_MANAGE)),
 ) -> FinanceAccountRead:
-    return FinanceService(db).create_account(payload)
+    account = FinanceService(db).create_account(payload)
+    record_audit_log(db, current_user, "finance", "create_account", f"创建资金账户：{account.name}", "finance_account", account.id, account.name, request)
+    return account
 
 
 @router.get("/finance-accounts/{account_id}", response_model=FinanceAccountRead)
@@ -102,29 +118,37 @@ def get_finance_account(
 def update_finance_account(
     account_id: int,
     payload: FinanceAccountUpdate,
+    request: Request,
     db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_user),
+    current_user: User = Depends(require_permission(Permission.FINANCE_MANAGE)),
 ) -> FinanceAccountRead:
-    return FinanceService(db).update_account(account_id, payload)
+    account = FinanceService(db).update_account(account_id, payload)
+    record_audit_log(db, current_user, "finance", "update_account", f"编辑资金账户：{account.name}", "finance_account", account.id, account.name, request)
+    return account
 
 
 @router.delete("/finance-accounts/{account_id}", response_model=SuccessResponse)
 def delete_finance_account(
     account_id: int,
+    request: Request,
     db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_user),
+    current_user: User = Depends(require_permission(Permission.FINANCE_MANAGE)),
 ) -> SuccessResponse:
     FinanceService(db).delete_account(account_id)
+    record_audit_log(db, current_user, "finance", "delete_account", f"删除资金账户：{account_id}", "finance_account", account_id, str(account_id), request)
     return SuccessResponse()
 
 
 @router.post("/finance-accounts/{account_id}/toggle-active", response_model=FinanceAccountRead)
 def toggle_finance_account_active(
     account_id: int,
+    request: Request,
     db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_user),
+    current_user: User = Depends(require_permission(Permission.FINANCE_MANAGE)),
 ) -> FinanceAccountRead:
-    return FinanceService(db).toggle_account_active(account_id)
+    account = FinanceService(db).toggle_account_active(account_id)
+    record_audit_log(db, current_user, "finance", "toggle_account", f"启用禁用资金账户：{account.name}", "finance_account", account.id, account.name, request)
+    return account
 
 
 @router.get("/finance-records", response_model=FinanceRecordListResponse)
@@ -149,10 +173,13 @@ def list_finance_records(
 @router.post("/finance-records", response_model=FinanceRecordRead)
 def create_finance_record(
     payload: FinanceRecordCreate,
+    request: Request,
     db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_user),
+    current_user: User = Depends(require_permission(Permission.FINANCE_MANAGE)),
 ) -> FinanceRecordRead:
-    return FinanceService(db).create_record(payload, current_user)
+    record = FinanceService(db).create_record(payload, current_user)
+    record_audit_log(db, current_user, "finance", "create_record", f"新增收支流水：{record.record_no}", "finance_record", record.id, record.record_no, request)
+    return record
 
 
 @router.get("/finance-records/{record_id}", response_model=FinanceRecordRead)
@@ -168,7 +195,10 @@ def get_finance_record(
 def void_finance_record(
     record_id: int,
     payload: FinanceRecordVoid,
+    request: Request,
     db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_user),
+    current_user: User = Depends(require_permission(Permission.FINANCE_MANAGE)),
 ) -> FinanceRecordRead:
-    return FinanceService(db).void_record(record_id, payload, current_user)
+    record = FinanceService(db).void_record(record_id, payload, current_user)
+    record_audit_log(db, current_user, "finance", "void_record", f"作废收支流水：{record.record_no}", "finance_record", record.id, record.record_no, request)
+    return record

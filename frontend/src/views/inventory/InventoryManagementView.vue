@@ -11,9 +11,12 @@ import {
   setInitialStock,
 } from "@/api/inventory";
 import { t } from "@/i18n";
+import { useAuthStore } from "@/stores/auth";
 import type { ProductCategory } from "@/types/product";
 import type { InventoryRecord, StockMovementRecord, Warehouse } from "@/types/inventory";
+import { hasPermission, Permission } from "@/utils/permissions";
 
+const authStore = useAuthStore();
 const activeTab = ref<"balance" | "movements">("balance");
 const balanceLoading = ref(false);
 const movementLoading = ref(false);
@@ -28,6 +31,7 @@ const adjustmentDialogVisible = ref(false);
 const currentRow = ref<InventoryRecord | null>(null);
 const initialFormRef = ref<FormInstance>();
 const adjustmentFormRef = ref<FormInstance>();
+const canManageInventory = computed(() => hasPermission(authStore.user, Permission.INVENTORY_MANAGE));
 
 const balanceQuery = reactive({
   keyword: "",
@@ -324,8 +328,8 @@ onMounted(async () => {
           </el-table-column>
           <el-table-column :label="t('actions')" fixed="right" width="260">
             <template #default="{ row }">
-              <el-button size="small" @click="openInitialDialog(row)">{{ t("initialStock") }}</el-button>
-              <el-button size="small" @click="openAdjustmentDialog(row)">{{ t("inventoryAdjustment") }}</el-button>
+              <el-button v-if="canManageInventory" size="small" @click="openInitialDialog(row)">{{ t("initialStock") }}</el-button>
+              <el-button v-if="canManageInventory" size="small" @click="openAdjustmentDialog(row)">{{ t("inventoryAdjustment") }}</el-button>
               <el-button size="small" @click="viewMovements(row)">{{ t("viewMovements") }}</el-button>
             </template>
           </el-table-column>

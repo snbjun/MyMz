@@ -5,6 +5,7 @@ import { useRoute, useRouter } from "vue-router";
 import { moduleRoutes } from "@/router";
 import { useAuthStore } from "@/stores/auth";
 import { MessageKey, t } from "@/i18n";
+import { hasPermission, Permission } from "@/utils/permissions";
 
 const route = useRoute();
 const router = useRouter();
@@ -14,10 +15,20 @@ const activePath = computed(() => route.path);
 
 const menuItems = computed(() => [
   { path: "/", title: t("dashboard") },
-  ...moduleRoutes.map((item) => ({
-    path: `/${item.path}`,
-    title: t(item.titleKey as MessageKey),
-  })),
+  ...moduleRoutes
+    .filter((item) => {
+      if ("requiresSuperuser" in item && item.requiresSuperuser && !authStore.user?.is_superuser) {
+        return false;
+      }
+      if ("permission" in item && item.permission) {
+        return hasPermission(authStore.user, item.permission as Permission);
+      }
+      return true;
+    })
+    .map((item) => ({
+      path: `/${item.path}`,
+      title: t(item.titleKey as MessageKey),
+    })),
 ]);
 
 async function handleLogout() {

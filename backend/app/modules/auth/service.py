@@ -1,11 +1,12 @@
 from datetime import datetime, timezone
 
-from fastapi import HTTPException, status
+from fastapi import HTTPException, Request, status
 from sqlalchemy.orm import Session
 
 from app.core.config import settings
 from app.core.security import create_access_token, hash_password, verify_password
 from app.modules.auth.schemas import LoginRequest, LoginResponse
+from app.modules.audit_logs.service import record_audit_log
 from app.modules.users.model import User
 from app.modules.users.repository import UserRepository
 
@@ -17,7 +18,7 @@ class AuthService:
         self.db = db
         self.repo = UserRepository(db)
 
-    def login(self, payload: LoginRequest) -> LoginResponse:
+    def login(self, payload: LoginRequest, request: Request | None = None) -> LoginResponse:
         user = self.repo.get_by_username(payload.username)
         if (
             user is None
@@ -33,6 +34,17 @@ class AuthService:
         user.last_login_at = datetime.now(timezone.utc)
         self.db.commit()
         self.db.refresh(user)
+        record_audit_log(
+            self.db,
+            user,
+            module="auth",
+            action="login",
+            target_type="user",
+            target_id=user.id,
+            target_label=user.username,
+            summary=f"登录成功：{user.username}",
+            request=request,
+        )
         return LoginResponse(access_token=create_access_token(str(user.id)), user=user)
 
 

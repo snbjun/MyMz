@@ -5,6 +5,7 @@ from sqlalchemy import engine_from_config, pool
 
 from app.core.config import settings
 from app.core.database import Base
+from app.modules.audit_logs import model as audit_logs_model  # noqa: F401
 from app.modules.customers import model as customers_model  # noqa: F401
 from app.modules.finance import model as finance_model  # noqa: F401
 from app.modules.inventory import model as inventory_model  # noqa: F401
